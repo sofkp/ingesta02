@@ -1,27 +1,22 @@
-import boto3
-import pandas as pd
-import mysql.connector
 
-def mysql_to_csv(host, port, user, password, database, table, ficheroUpload):
-    connection = mysql.connector.connect(
+import pymysql
+import pandas as pd
+import boto3
+
+def export_mysql_to_s3(host, port, user, password, database, table, output_file, bucket_name):
+    connection = pymysql.connect(
         host=host,
-        port=port,
+        port=int(port),
         user=user,
         password=password,
         database=database
     )
-
-    query = f"SELECT * FROM {table}"
-    df = pd.read_sql(query, connection)
-    df.to_csv(ficheroUpload, index=False)
-
+    df = pd.read_sql(f"SELECT * FROM {table}", connection)
+    df.to_csv(output_file, index=False)
     connection.close()
 
-ficheroUpload = "data.csv"
-nombreBucket = "skp-output-ingesta02"
+    boto3.client('s3').upload_file(output_file, bucket_name, output_file)
 
-mysql_to_csv('3.86.145.216', '8001', 'root', 'utec', 'tienda', 'fabricantes', ficheroUpload)
-
-res = boto3.client('s3').upload_file(ficheroUpload, nombreBucket, ficheroUpload)
+export_mysql_to_s3('3.86.145.216', 8005, 'root', 'utec', 'tienda', 'fabricantes', 'data.csv', 'skp-output-ingesta02')
 
 print("Ingesta completada")
