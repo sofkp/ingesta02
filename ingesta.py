@@ -16,6 +16,6 @@ def export_mysql_to_s3(host, port, user, password, database, table, output_file,
 
     boto3.client('s3').upload_file(output_file, bucket_name, output_file)
 
-export_mysql_to_s3('52.72.186.244', 8008, 'root', 'utec', 'tienda', 'fabricantes', 'data.csv', 'skp-output-ingesta02')
+export_mysql_to_s3('52.72.186.244', 8005, 'root', 'utec', 'tienda', 'fabricantes', 'data.csv', 'skp-output-ingesta02')
 
 print("Ingesta completada")
